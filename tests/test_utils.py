@@ -1,7 +1,10 @@
-import datetime as dt
 from collections import namedtuple
-from functools import partial
 from copy import copy, deepcopy
+import datetime as dt
+from decimal import Decimal
+from functools import partial
+from numbers import Real
+import typing
 
 import pytest
 
@@ -226,6 +229,28 @@ def test_from_iso_date():
     result = utils.from_iso_date(iso_date)
     assert type(result) == dt.date
     assert_date_equal(result, d)
+
+
+@pytest.mark.parametrize(
+    "value,ms,expected",
+    [
+        (0, False, dt.datetime.fromtimestamp(0)),
+        (0, True, dt.datetime.fromtimestamp(0)),
+        (-1, False, dt.datetime.fromtimestamp(-1)),
+        (-1000, True, dt.datetime.fromtimestamp(-1)),
+        (1550000000, False, dt.datetime.fromtimestamp(1550000000)),
+        (1550000000.000123, False, dt.datetime.fromtimestamp(1550000000.000123)),
+        (1598585729.952007, False, dt.datetime.fromtimestamp(1598585729.952007)),
+        (1598585729952.007, True, dt.datetime.fromtimestamp(1598585729.952007)),
+    ],
+)
+def test_from_to_unix_timestamp(
+    value: typing.Union[str, Real, Decimal], ms: bool, expected: dt.datetime
+) -> None:
+    """ Tests from_unix_timestamp and to_unix_timestamp. """
+    for vt in map(lambda t: t(value), [float, str, Decimal]):
+        assert utils.from_unix_timestamp(vt, ms=ms) == expected
+        assert utils.to_unix_timestamp(expected, ms=ms) == value
 
 
 def test_get_func_args():
