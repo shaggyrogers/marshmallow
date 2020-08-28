@@ -477,6 +477,25 @@ class TestFieldSerialization:
             field = fields.DateTime(format=fmt)
         assert field.serialize("d", {"d": value}) == expected
 
+    @pytest.mark.parametrize(
+        ("value", "expected"),
+        [
+            (
+                dt.datetime(2013, 11, 10, 1, 23, 45, tzinfo=dt.timezone.utc),
+                1384046625.0,
+            ),
+            (
+                central.localize(dt.datetime(2013, 11, 10, 1, 23, 45), is_dst=False),
+                1384068225.0,
+            ),
+        ],
+    )
+    def test_datetime_field_unix(self, value: dt.datetime, expected: float) -> None:
+        assert fields.DateTime(format="unix").serialize("d", {"d": value}) == expected
+
+        js = fields.DateTime(format="javascript")
+        assert js.serialize("d", {"d": value}) == expected * 1000
+
     def test_datetime_field_format(self, user):
         format = "%Y-%m-%d"
         field = fields.DateTime(format=format)
