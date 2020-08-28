@@ -234,14 +234,26 @@ def test_from_iso_date():
 @pytest.mark.parametrize(
     "value,ms,expected",
     [
-        (0, False, dt.datetime.fromtimestamp(0)),
-        (0, True, dt.datetime.fromtimestamp(0)),
-        (-1, False, dt.datetime.fromtimestamp(-1)),
-        (-1000, True, dt.datetime.fromtimestamp(-1)),
-        (1550000000, False, dt.datetime.fromtimestamp(1550000000)),
-        (1550000000.000123, False, dt.datetime.fromtimestamp(1550000000.000123)),
-        (1598585729.952007, False, dt.datetime.fromtimestamp(1598585729.952007)),
-        (1598585729952.007, True, dt.datetime.fromtimestamp(1598585729.952007)),
+        (0, False, dt.datetime.fromtimestamp(0, tz=dt.timezone.utc)),
+        (0, True, dt.datetime.fromtimestamp(0, tz=dt.timezone.utc)),
+        (-1, False, dt.datetime.fromtimestamp(-1, tz=dt.timezone.utc)),
+        (-1000, True, dt.datetime.fromtimestamp(-1, tz=dt.timezone.utc)),
+        (1550000000, False, dt.datetime.fromtimestamp(1550000000, tz=dt.timezone.utc)),
+        (
+            1550000000.000123,
+            False,
+            dt.datetime.fromtimestamp(1550000000.000123, tz=dt.timezone.utc),
+        ),
+        (
+            1598585729.952007,
+            False,
+            dt.datetime.fromtimestamp(1598585729.952007, tz=dt.timezone.utc),
+        ),
+        (
+            1598585729952.007,
+            True,
+            dt.datetime.fromtimestamp(1598585729.952007, tz=dt.timezone.utc),
+        ),
     ],
 )
 def test_from_to_unix_timestamp(

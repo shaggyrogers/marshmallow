@@ -212,7 +212,7 @@ def from_unix_timestamp(
     if isinstance(value, (str, decimal.Decimal)):
         value = float(value)
 
-    return dt.datetime.fromtimestamp(value / 1000 if ms else value)
+    return dt.datetime.fromtimestamp(value / 1000 if ms else value, tz=dt.timezone.utc)
 
 
 def to_unix_timestamp(value: dt.datetime, ms: bool = False) -> dt.datetime:
