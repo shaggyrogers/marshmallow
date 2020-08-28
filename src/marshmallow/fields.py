@@ -3,11 +3,12 @@
 import collections
 import copy
 import datetime as dt
-import numbers
-import uuid
 import decimal
+import functools
 import math
+import numbers
 import typing
+import uuid
 import warnings
 from collections.abc import Mapping as _Mapping
 
@@ -1143,7 +1144,9 @@ class DateTime(Field):
     Example: ``'2014-12-22T03:12:58.019077+00:00'``
 
     :param format: Either ``"rfc"`` (for RFC822), ``"iso"`` (for ISO8601),
-        or a date format string. If `None`, defaults to "iso".
+        ``"unix"`` (seconds since Unix epoch),
+        ``"javascript"`` (milliseconds since Unix epoch), or a date format string.
+        If `None`, defaults to "iso".
     :param kwargs: The same keyword arguments that :class:`Field` receives.
 
     .. versionchanged:: 3.0.0rc9
@@ -1155,6 +1158,8 @@ class DateTime(Field):
         "iso8601": utils.isoformat,
         "rfc": utils.rfcformat,
         "rfc822": utils.rfcformat,
+        "unix": utils.to_unix_timestamp,
+        "javascript": functools.partial(utils.to_unix_timestamp, ms=True),
     }  # type: typing.Dict[str, typing.Callable[[typing.Any], str]]
 
     DESERIALIZATION_FUNCS = {
@@ -1162,6 +1167,8 @@ class DateTime(Field):
         "iso8601": utils.from_iso_datetime,
         "rfc": utils.from_rfc,
         "rfc822": utils.from_rfc,
+        "unix": utils.from_unix_timestamp,
+        "javascript": functools.partial(utils.from_unix_timestamp, ms=True),
     }  # type: typing.Dict[str, typing.Callable[[str], typing.Any]]
 
     DEFAULT_FORMAT = "iso"

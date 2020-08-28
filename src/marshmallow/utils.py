@@ -2,8 +2,10 @@
 import collections
 import functools
 import datetime as dt
+import decimal
 import inspect
 import json
+import numbers
 import re
 import typing
 import warnings
@@ -194,6 +196,33 @@ def isoformat(datetime: dt.datetime) -> str:
 
 def to_iso_date(date: dt.date) -> str:
     return dt.date.isoformat(date)
+
+
+def from_unix_timestamp(
+    value: typing.Union[str, decimal.Decimal, numbers.Real], ms: bool = False
+) -> dt.datetime:
+    """ Parse a Unix timestamp string and return a datetime.datetime.
+
+    :param value str: The string to parse.
+    :param ms bool: If `True`, assume the timestamp is in milliseconds rather than
+                    seconds. Useful for javascript's Date object.
+    """
+    # Workaround for Decimal truncation bug (see https://bugs.python.org/issue23607)
+    # As microsecond < 0xf4240, loss of precision should not be an issue.
+    if isinstance(value, (str, decimal.Decimal)):
+        value = float(value)
+
+    return dt.datetime.fromtimestamp(value / 1000 if ms else value)
+
+
+def to_unix_timestamp(value: dt.datetime, ms: bool = False) -> dt.datetime:
+    """ Parse a Unix timestamp string and return a datetime.datetime.
+
+    :param value datetime: The datetime to format.
+    :param ms bool: If `True`, represent `value` using milliseconds rather than seconds.
+    """
+    result = value.timestamp()
+    return result * 1000 if ms else result
 
 
 def ensure_text_type(val: typing.Union[str, bytes]) -> str:
