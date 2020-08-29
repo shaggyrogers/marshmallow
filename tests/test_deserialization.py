@@ -518,6 +518,28 @@ class TestFieldDeserialization:
             assert field.deserialize(value) == expected
 
     @pytest.mark.parametrize(
+        ("value", "expected"),
+        [
+            (
+                1384046625.0,
+                dt.datetime(2013, 11, 10, 1, 23, 45, tzinfo=dt.timezone.utc),
+            ),
+            (
+                1384068225.0,
+                central.localize(dt.datetime(2013, 11, 10, 1, 23, 45), is_dst=False),
+            ),
+            (0.0, dt.datetime(1970, 1, 1, 0, 0, tzinfo=dt.timezone.utc),),
+        ],
+    )
+    def test_datetime_field_unix_deserialization(
+        self, value: float, expected: dt.datetime
+    ) -> None:
+        assert fields.DateTime(format="unix").deserialize(value) == expected
+
+        js = fields.DateTime(format="javascript")
+        assert js.deserialize(value * 1000) == expected
+
+    @pytest.mark.parametrize(
         ("fmt", "timezone", "value", "expected"),
         [
             ("iso", None, "2013-11-10T01:23:45", dt.datetime(2013, 11, 10, 1, 23, 45)),
