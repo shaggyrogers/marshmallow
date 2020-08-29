@@ -488,6 +488,7 @@ class TestFieldSerialization:
                 central.localize(dt.datetime(2013, 11, 10, 1, 23, 45), is_dst=False),
                 1384068225.0,
             ),
+            (dt.datetime(1970, 1, 1, 0, 0, tzinfo=dt.timezone.utc), 0.0),
         ],
     )
     def test_datetime_field_unix(self, value: dt.datetime, expected: float) -> None:
